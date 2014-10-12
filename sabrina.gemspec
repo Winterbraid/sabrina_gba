@@ -12,22 +12,8 @@ Gem::Specification.new do |s|
 	s.description = <<-EOT
     A library for manipulating GBA ROMs of a popular monster collection RPG
     series. It is written entirely in Ruby and uses Chunky PNG, which is also
-    a pure Ruby library.
-
-    Compared to the many excellent GUI tools available, this library focuses on
-    non-interactive manipulation of ROM data. Key features include:
-    * Support for several automatically recognized base ROM types. Additional
-      types can be supported by placing JSON files in the user's +.sabrina+
-      directory.
-    * Import and export sprite sheets to or from PNG files via Chunky PNG. The
-      256x64 format (front, shiny front, back, shiny back) compatible with tools
-      such as G3HS or A-Series is automatically recognized.
-    * Direct transfer of data between two ROM files, bypassing the stage of
-      opening several application windows or creating intermediary files on
-      the HDD.
-    * Access to low-level read-and-write operations on ROMs through Bytestream
-      instances, with support for LZ77 compression and encoding/decoding text
-      strings.
+    a pure Ruby library. Compared to the many excellent GUI tools available,
+    this library focuses on non-interactive manipulation of ROM data.
 	EOT
 
 	s.authors = ['Winterbraid']
