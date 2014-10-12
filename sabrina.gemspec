@@ -31,6 +31,8 @@ Gem::Specification.new do |s|
 	EOT
 
 	s.authors = ['Winterbraid']
+	s.email = 'Winterbraid@users.noreply.github.com'
+	s.homepage = 'https://github.com/Winterbraid/sabrina_gba'
 	s.files = Dir['{lib}/**/*.rb', 'LICENSE']
 	s.license = 'MIT'
 
