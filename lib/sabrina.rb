@@ -8,7 +8,7 @@ require 'json'
 begin
   require 'oily_png'
   Sabrina.const_set(:PNG, 'oily_png')
-rescue
+rescue LoadError
   require 'chunky_png'
   Sabrina.const_set(:PNG, 'chunky_png')
 end
