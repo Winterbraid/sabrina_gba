@@ -1,0 +1,4 @@
+--title "Sabrina"
+--exclude sabrina_loader.rb
+lib/**/*.rb -
+README.rdoc
