@@ -12,30 +12,61 @@ Documentation:: http://rubydoc.info/gems/sabrina/frames
 
 == Example use
 
-  $ irb -r sabrina
-  irb(main):001:0> include Sabrina
-  => Object
-  irb(main):002:0> r = Rom.new "Decap and Attack Rombase 1.5.gba"
-  => MrDollSteak's Decap and Attack Rombase [MrDS]
-  irb(main):003:0> m = Monster.new r, 36
-  => 36. Clef[name redacted]
-  irb(main):004:0> puts m.stats.to_json
-  {
-    "36": {
-      "stats": {
-        "hp": 95,
-        "attack": 70,
-        "defense": 73,
-        "speed": 60,
-        "sp_atk": 85,
-        "sp_def": 90,
-        "type_1": "23 (Fairy)",
-  [output truncated]
-  => nil
-  irb(main):005:0> m.save_spritesheet
-  => #<File:Decap and Attack Rombase 1.5_files/036.png (closed)>
-  irb(main):006:0> r.close
-  => 0
+=== Basic usage
+
+  require 'sabrina'
+
+  include Sabrina
+
+  r = Rom.new "Decap and Attack Rombase 1.5.gba"
+  # => MrDollSteak's Decap and Attack Rombase [MrDS]
+
+  m = Monster.new r, 36 # => 36. Clef/name redacted/
+
+  m.stats.to_json
+  # =>
+  # {
+  #   "36": {
+  #     "stats": {
+  #       "hp": 95,
+  #       "attack": 70,
+  #       "defense": 73,
+  #       "speed": 60,
+  #       "sp_atk": 85,
+  #       "sp_def": 90,
+  #       "type_1": "23 (Fairy)",
+  # /output truncated/
+
+  m.save_spritesheet
+  # => #<File:Decap and Attack Rombase 1.5_files/036.png (closed)>
+
+  r.close # => 0
+
+=== Copy sprites between ROMs
+
+  require 'benchmark'
+  require 'sabrina'
+
+  include Sabrina
+
+  r1 = Rom.new 'Moemon FireRed (1.5).gba'
+  r2 = Rom.new 'Ruby (E).gba'
+
+  puts "Copying sprites from #{r1} to #{r2}."
+
+  b = Benchmark.measure do
+    (1..414).each do |i|
+      m = Monster.new r1, i
+      print "#{ m.to_s.ljust(20, ' ') }\r"
+      m.rom = r2
+      m.write_spritesheet
+    end
+  end
+
+  r1.close
+  r2.close
+
+  puts "\nTook #{b.real} seconds."
 
 == Sabrina is...
 
