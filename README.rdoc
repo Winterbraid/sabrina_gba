@@ -123,7 +123,12 @@ table offsets have been changed).
 * Either the Lz77 compressor or the image encoder has a problem with the monster
   no. 360 for some reason. Copying from another ROM still works fine (likely
   because it bypasses the encoding step and uses the data from the source ROM
-  directly), but loading from PNG will result in garbled sprites for frames 3-4.
+  directly), but loading from PNG will result in garbled sprites for forms 3-4.
+* Due to some inaccuracies in the Lz77 decompressor, reliably measuring the
+  size of the original compressed data on the ROM seems impossible as of present.
+  For that reason, the current version will not wipe old lz77 data upon rewrites,
+  which may lead to ROM bloat over time. It is recommended to write to clean ROM
+  bases whenever possible.
 
 Currently missing features include:
 * Support for Sapphire and LeafGreen.
