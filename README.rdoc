@@ -3,26 +3,94 @@
 A library for manipulating GBA ROMs of a popular monster collection RPG series.
 It is written entirely in Ruby and uses
 {Chunky PNG}[https://github.com/wvanbergen/chunky_png], which is also a pure
-Ruby library.
+Ruby library. Compared to the many excellent GUI tools available, Sabrina
+focuses on non-interactive manipulation of ROM data.
 
-Compared to the many excellent GUI tools available, this library focuses on
-non-interactive manipulation of ROM data. Key features include:
-* Support for several automatically recognized base ROM types. Additional types
-  can be supported by placing JSON files in the user's +.sabrina+ directory.
-* Import and export sprite sheets to or from PNG files via
-  {Chunky PNG}[https://github.com/wvanbergen/chunky_png]. The 256x64 format
-  (front, shiny front, back, shiny back) compatible with tools such as
-  G3HS[https://github.com/thekaratekid552/Secret-Tool] or A-Series is
-  automatically recognized.
-* Directly transfer data between two ROM files, bypassing the stage of opening
-  several application windows or creating intermediary files on the HDD.
-* Access to low-level read-and-write operations on ROMs through Bytestream
-  objects, with support for LZ77[http://en.wikipedia.org/wiki/LZ77_and_LZ78]
-  compression and encoding/decoding text strings.
+Source code:: https://github.com/Winterbraid/sabrina_gba
+Gem:: https://rubygems.org/gems/sabrina
+Documentation:: http://rubydoc.info/gems/sabrina/frames
 
-Known issues:
+== Example use
+
+  $ irb -r sabrina
+  irb(main):001:0> include Sabrina
+  => Object
+  irb(main):002:0> r = Rom.new "Decap and Attack Rombase 1.5.gba"
+  => MrDollSteak's Decap and Attack Rombase [MrDS]
+  irb(main):003:0> m = Monster.new r, 36
+  => 36. Clef[name redacted]
+  irb(main):004:0> puts m.stats.to_json
+  {
+    "36": {
+      "stats": {
+        "hp": 95,
+        "attack": 70,
+        "defense": 73,
+        "speed": 60,
+        "sp_atk": 85,
+        "sp_def": 90,
+        "type_1": "23 (Fairy)",
+  [output truncated]
+  => nil
+  irb(main):005:0> m.save_spritesheet
+  => #<File:Decap and Attack Rombase 1.5_files/036.png (closed)>
+  irb(main):006:0> r.close
+  => 0
+
+== Sabrina is...
+
+<b>...a backend.</b> The main purpose of the library is to be used inside
+other programs. That said, Ruby comes packaged with a robust interactive
+interpreter in the form of +irb+, and the classes and methods of Sabrina are
+intended to be human-friendly enough to easily perform many tasks from the +irb+
+prompt with even a rudimentary knowledge of Ruby.
+
+<b>...reasonably quick.</b> While Ruby is not the speediest language out there,
+Sabrina employs internal caching to avoid certain costly operations when
+possible. This design particularly shines in the use case of copying data
+between two ROMs, where Sabrina should always be faster than a tool that relies
+on temporary HDD files or multiple program instances.
+
+<b>...extensible.</b> ROM types should be recognized automatically, and adding
+support for new ROM bases is as simple as dropping a JSON file in ~/.sabrina
+(assuming the ROM uses a unique ID). The code is designed to allow easy
+addition of data abstractions, which means new features should arrive at
+a reasonable pace.
+
+<b>...mostly clean.</b> The library itself is warning-free (any warnings
+produced with the -w switch come from ChunkyPNG). Adherence to the
+{Ruby Style Guide}[https://github.com/bbatsov/ruby-style-guide], while not
+strict, is kept at what is perceived to be a reasonable level.
+
+== Sabrina is not...
+
+<b>...complete.</b> Currently the Monster class provides an abstraction for
+dealing with monster data, and handlers exist for sprites and base stats.
+Adding support for other monster-related data sets such as evolutions or dex
+entries is a high priority, after which moves and items may be looked
+at.
+
+<b>...a user interface.</b> It comes with no GUI or CLI in the traditional
+sense, and it is unlikely one will be included. However, scripts are in
+the works that should cover many common use cases and provide inspiration for
+advanced users to write their own.
+
+<b>...a backup manager.</b> In accordance with the above, all write
+operations will be performed directly on the ROM, without waiting for a
+separate save command, and there is no undo feature. Therefore, it is the
+user's responsibility to maintain backups of ROM files.
+
+<b>...a limit remover/table expander.</b> If you need those, you should try
+{G3HS}[https://github.com/thekaratekid552/Secret-Tool/], look for a premade
+expanded ROM base, or refer to a tutorial. However, Sabrina does try to make as
+few assumptions about limits as possible, so expanded ROMs should be supported
+out of the box (although custom IDs and config files might be required if
+table offsets have been changed).
+
+== Known issues
+
 * Either the Lz77 compressor or the image encoder has a problem with the monster
-  number 360 some reason. Copying from another ROM still works fine (likely
+  no. 360 for some reason. Copying from another ROM still works fine (likely
   because it bypasses the encoding step and uses the data from the source ROM
   directly), but loading from PNG will result in garbled sprites for frames 3-4.
 

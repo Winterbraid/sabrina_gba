@@ -2,12 +2,12 @@
   # Current software version.
   #
   # @return [String]
-  VERSION = '0.5.5.2'
+  VERSION = '0.5.5.3'
 
   # Date of the current version.
   #
   # @return [String]
-  DATE = '2014-10-12'
+  DATE = '2014-10-13'
 
   # A short description.
   #
