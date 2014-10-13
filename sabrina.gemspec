@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 	s.authors = ['Winterbraid']
 	s.email = 'Winterbraid@users.noreply.github.com'
 	s.homepage = 'https://github.com/Winterbraid/sabrina_gba'
-	s.files = Dir['{lib}/**/*.rb', 'LICENSE']
+	s.files = Dir['{lib}/**/*.rb', 'LICENSE', 'README.rdoc']
 	s.license = 'MIT'
 
 	s.add_runtime_dependency('json')
