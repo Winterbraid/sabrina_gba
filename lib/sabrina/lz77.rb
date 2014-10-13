@@ -10,7 +10,7 @@ module Sabrina
   # Credit goes to thekaratekid552, Jambo51, Shiny Quagsire,
   # DoesntKnowHowToPlay, Interdpth.
   #
-  # == Original code license
+  # == License
   #
   #   The MIT License (MIT)
   #

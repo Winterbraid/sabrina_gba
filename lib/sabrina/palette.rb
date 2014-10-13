@@ -13,7 +13,7 @@ module Sabrina
   # {https://github.com/thekaratekid552/Secret-Tool Gen III Hacking Suite}
   # by thekaratekid552.
   #
-  # == Original code license:
+  # == Original code license
   #
   #   The MIT License (MIT)
   #
