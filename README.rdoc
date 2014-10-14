@@ -15,16 +15,16 @@ Documentation:: http://rubydoc.info/gems/sabrina/frames
 === Basic usage
 
   require 'sabrina'
-
+  
   include Sabrina
-
+  
   r = Rom.new "Decap and Attack Rombase 1.5.gba"
   # => MrDollSteak's Decap and Attack Rombase [MrDS]
-
-  m = Monster.new r, 36 # => 36. Clef/name redacted/
-
+  
+  m = Monster.new r, 36
+  # => 36. Clef/name redacted/
+  
   m.stats.to_json
-  # =>
   # {
   #   "36": {
   #     "stats": {
@@ -35,25 +35,34 @@ Documentation:: http://rubydoc.info/gems/sabrina/frames
   #       "sp_atk": 85,
   #       "sp_def": 90,
   #       "type_1": "23 (Fairy)",
-  # /output truncated/
+  #       "type_2": "23 (Fairy)",
+  #       "catch_rate": 25,
+  #       "exp_yield": 129,
+  #       "ev_yield": {
+  #         "hp": 3
+  #       },
+  #       /output truncated/
+  #     }
+  #   }
+  # }
 
   m.save_spritesheet
   # => #<File:Decap and Attack Rombase 1.5_files/036.png (closed)>
-
+  
   r.close # => 0
 
 === Copy sprites between ROMs
 
   require 'benchmark'
   require 'sabrina'
-
+  
   include Sabrina
-
+  
   r1 = Rom.new 'Moemon FireRed (1.5).gba'
   r2 = Rom.new 'Ruby (E).gba'
-
+  
   puts "Copying sprites from #{r1} to #{r2}."
-
+  
   b = Benchmark.measure do
     (1..414).each do |i|
       m = Monster.new r1, i
@@ -62,10 +71,10 @@ Documentation:: http://rubydoc.info/gems/sabrina/frames
       m.write_spritesheet
     end
   end
-
+  
   r1.close
   r2.close
-
+  
   puts "\nTook #{b.real} seconds."
 
 == Sabrina is...
