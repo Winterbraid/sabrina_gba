@@ -5,17 +5,20 @@ module Sabrina
     #
     # @see Plugin
     class Stats < Plugin
-      # @see Plugin::ENHANCES
+      # {include:Plugin::ENHANCES}
       ENHANCES = Monster
 
-      # @see Plugin::PLUGIN_NAME
+      # {include:Plugin::PLUGIN_NAME}
       PLUGIN_NAME = 'Stats'
 
-      # @see Plugin::SHORT_NAME
+      # {include:Plugin::SHORT_NAME}
       SHORT_NAME = 'stats'
 
-      # @see Plugin::FEATURES
+      # {include:Plugin::FEATURES}
       FEATURES = Set.new [:reread, :write]
+
+      # {include:Plugin::SUFFIX}
+      SUFFIX = '_stats.json'
 
       # Describes the order in which various stats appear in the byte data.
       # All of these will also be converted into attributes on runtime and
@@ -59,6 +62,8 @@ module Sabrina
       # @!attribute [rw] index
       #   The real index of the monster.
       #   @return [Integer]
+
+      # This breaks Yard.
       attr_accessor(:rom, :index, *STRUCTURE)
 
       # Generates a new Stats object.
@@ -110,6 +115,22 @@ module Sabrina
           table: :stats_table,
           index: @index
         )
+      end
+
+      # Loads a hash representation of the stats. If present, nested hashes
+      # under a key equivalent to +:stats+ or own index will be loaded.
+      #
+      # @param [Hash] hash
+      # @return [self]
+      def load_hash(hash)
+        return load_hash(hash[@index]) if hash.key?(@index)
+        return load_hash(hash[:stats]) if hash.key?(:stats)
+
+        STRUCTURE.each do |entry|
+          value = hash.fetch(entry) { next }
+          pretty_value = prettify_stat(entry, value)
+          instance_variable_set('@' << entry.to_s, pretty_value)
+        end
       end
 
       # Returns a hash representation of the stats.
@@ -191,6 +212,8 @@ module Sabrina
       end
 
       # Attempts to annotate a numeric value with useful information.
+      #
+      # @return [String]
       def prettify_stat(entry, value)
         return "#{value} (#{gender_info(value)})" if entry == :gender
 
@@ -206,6 +229,8 @@ module Sabrina
 
       # Displays readable info about the gender distribution defined by the
       # provided gender value.
+      #
+      # @return [String]
       def gender_info(i)
         return 'Genderless' if i > 254
         return 'Always Female' if i == 254

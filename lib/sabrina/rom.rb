@@ -116,10 +116,11 @@ module Sabrina
     #   in the ROM {Config} data.
     # @param [Integer] index in the case of a monster, the real index
     #   of the monster.
+    # @param [Integer] length the length of a single entry.
     # @return [Integer]
     # @see offset_to_pointer
-    def read_offset_from_table(name, index)
-      pointer = read_table(name, index, 8, 3)
+    def read_offset_from_table(name, index, length = 8)
+      pointer = read_table(name, index, length, 3)
       self.class.pointer_to_offset(pointer)
     end
 
@@ -162,6 +163,67 @@ module Sabrina
       read(table(name) + index * index_length, length)
     end
 
+    # Reads the data from +offset+, assuming it to be {Lz77}-compressed.
+    #
+    # @param [Integer] offset
+    # @return [Hash] contains the uncompressed data as +:stream+ and the
+    #   estimated original compressed length as +:original_length+.
+    # @see Lz77.uncompress
+    def read_lz77(offset)
+      Lz77.uncompress(self, offset)
+    end
+
+    # Reads a stream expected to be a 0xFF-terminated GBA string from +offset+.
+    #
+    # @param [Integer] offset
+    # @return [String]
+    # @see GBAString
+    def read_string(offset)
+      read_until(offset, "\xFF")
+    end
+
+    # Reads bytes from a position in a table, expecting the data to end in
+    # +terminator+.
+    #
+    # @param [String, Symbol] name the name of the table as specified
+    #   in the ROM {Config} data.
+    # @param [Integer] index in the case of a monster, the real index
+    #   of the monster.
+    # @param [Integer] index_length The number of bytes occupied by each
+    #   index in +table+. If absent, will search {Config} for a +_length+
+    #   param associated with the table.
+    # @param [String] terminator
+    # @return [String]
+    # @see GBAString
+    def read_table_until(name, index, index_length = nil, terminator)
+      offset = read_offset_from_table(name, index, index_length)
+      read_until(offset, terminator)
+    end
+
+    # Reads bytes from +offset+ until +terminator+.
+    #
+    # @param [Integer] offset
+    # @param [String] terminator
+    # @return [String]
+    # @see GBAString
+    def read_until(offset, terminator)
+      term = terminator.force_encoding('ASCII-8BIT')
+
+      @file.seek(offset)
+      @file.gets(term)
+    end
+
+    # Reads +length+ bytes from +offset+, or the entire rest of the file
+    # if +length+ is not specified.
+    #
+    # @param [Integer] offset
+    # @param [Integer] length
+    # @return [String]
+    def read(offset, length = nil)
+      @file.seek(offset)
+      length ? @file.read(length) : @file.read
+    end
+
     # Returns the position of the first occurence of +length+ 0xFF
     # bytes, assumed to be free space available for writing.
     # If +start+ is +nil+, the search will begin at the +:free_space_start+
@@ -180,39 +242,6 @@ module Sabrina
 
       match += 1 until match % 4 == 0
       find_free(length, match)
-    end
-
-    # Reads the data from +offset+, assuming it to be {Lz77}-compressed.
-    #
-    # @param [Integer] offset
-    # @return [Hash] contains the uncompressed data as +:stream+ and the
-    #   estimated original compressed length as +:original_length+.
-    # @see Lz77.uncompress
-    def read_lz77(offset)
-      Lz77.uncompress(self, offset)
-    end
-
-    # Reads a stream expected to be an 0xFF-terminated GBA string from +offset+.
-    #
-    # @param [Integer] offset
-    # @return [String]
-    # @see GBAString
-    def read_string(offset)
-      term = "\xFF".force_encoding('ASCII-8BIT')
-
-      @file.seek(offset)
-      @file.gets(term)
-    end
-
-    # Reads +length+ bytes from +offset+, or the entire rest of the file
-    # if +length+ is not specified.
-    #
-    # @param [Integer] offset
-    # @param [Integer] length
-    # @return [String]
-    def read(offset, length = nil)
-      @file.seek(offset)
-      length ? @file.read(length) : @file.read
     end
 
     # Writes a stream of bytes at the provided offset.

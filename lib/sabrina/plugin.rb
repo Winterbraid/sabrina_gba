@@ -47,6 +47,9 @@ module Sabrina
     # Common features include +:reread+, +:write+, +:save+, +:load+.
     FEATURES = Set.new [:reread, :write, :save, :load]
 
+    # The suffix for saving files.
+    SUFFIX = '.dat'
+
     class << self
       # @see PLUGIN_NAME
       def plugin_name
@@ -140,6 +143,27 @@ module Sabrina
     # @return [String]
     def to_s
       "<#{self.class.plugin_name}>"
+    end
+
+    private
+
+    # Concatenate the file name and directory into a full path, optionally
+    # creating the directory if it doesn't exist.
+    #
+    # @param [String] file
+    # @param [String] dir
+    # @param [Hash] h
+    #   @option h [Boolean] :mkdir If +true+, create +dir+ if it doesn't
+    #     exist.
+    # @return [String]
+    def get_path(file, dir, h = {})
+      f, d = file.dup, dir.dup
+      d << '/' unless d.empty? || d.end_with?('/')
+
+      FileUtils.mkpath(d) if h.fetch(:mkdir, false) && !Dir.exist?(d)
+
+      path = d << f
+      path << self::SUFFIX unless path.downcase.end_with?(self::SUFFIX)
     end
   end
 end

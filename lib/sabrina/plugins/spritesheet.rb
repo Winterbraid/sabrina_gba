@@ -7,31 +7,26 @@ module Sabrina
     class Spritesheet < Plugin
       include ChildrenManager
 
-      # @see Plugin::ENHANCES
+      # {include:Plugin::ENHANCES}
       ENHANCES = Monster
 
-      # @see Plugin::PLUGIN_NAME
+      # {include:Plugin::PLUGIN_NAME}
       PLUGIN_NAME = 'Spritesheet'
 
-      # @see Plugin::SHORT_NAME
+      # {include:Plugin::SHORT_NAME}
       SHORT_NAME = 'spritesheet'
 
-      # @see Plugin::FEATURES
+      # {include:Plugin::FEATURES}
       FEATURES = Set.new [:reread, :write, :save, :load]
 
-      # @!attribute rom
+      # {include:Plugin::SUFFIX}
+      SUFFIX = '.png'
+
+      # @!attribute [rw] rom
       #   The current working ROM file.
       #   @return [Rom]
-      # @!method rom=(r)
-      #   The current working ROM file.
-      #   @param [Rom] r
-      #   @return [Rom]
-      # @!attribute index
+      # @!attribute [rw] index
       #   The real index of the monster.
-      #   @return [Integer]
-      # @!method index=(i)
-      #   The real index of the monster.
-      #   @param [Integer] i
       #   @return [Integer]
       attr_children :rom, :index
 
@@ -171,25 +166,6 @@ module Sabrina
         out_a = []
         (c.width / w).times { |i| out_a << c.crop(i * w, 0, w, c.height) }
         out_a
-      end
-
-      # Concatenate the file name and directory into a full path, optionally
-      # creating the directory if it doesn't exist.
-      #
-      # @param [String] file
-      # @param [String] dir
-      # @param [Hash] h
-      #   @option h [Boolean] :mkdir If +true+, create +dir+ if it doesn't
-      #     exist.
-      # @return [String]
-      def get_path(file, dir, h = {})
-        f, d = file.dup, dir.dup
-        d << '/' unless d.empty? || d.end_with?('/')
-
-        FileUtils.mkpath(d) if h.fetch(:mkdir, false) && !Dir.exist?(d)
-
-        path = d << f
-        path << '.png' unless path.downcase.end_with?('.png')
       end
     end
   end

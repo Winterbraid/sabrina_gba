@@ -2,7 +2,7 @@ module Sabrina
   # Current software version.
   #
   # @return [String]
-  VERSION = '0.5.5.6'
+  VERSION = '0.5.6'
 
   # Date of the current version.
   #

@@ -7,19 +7,11 @@ module Sabrina
   class Monster
     include ChildrenManager
 
-    # @!attribute rom
+    # @!attribute [rw] rom
     #   The current working ROM file.
     #   @return [Rom]
-    # @!method rom=(r)
-    #   The current working ROM file.
-    #   @param [Rom] r
-    #   @return [Rom]
-    # @!attribute index
+    # @!attribute [rw] index
     #   The real index of the monster.
-    #   @return [Integer]
-    # @!method index=(i)
-    #   The real index of the monster.
-    #   @param [Integer] i
     #   @return [Integer]
     attr_children :rom, :index
 
