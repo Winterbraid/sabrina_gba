@@ -1,6 +1,4 @@
 ﻿Sabrina::Config.load(
-  log_file: 'sabrina.log',
-
   rom_defaults: {
     title: 'Default ROM',
 
@@ -14,6 +12,7 @@
     name_length: 11,
     stats_length: 28,
     moveset_machine_length: 8,
+    moveset_tutor_length: 2,
 
     item_length: 44,
     machine_length: 2,
@@ -39,9 +38,11 @@
     stats_table: '0x254784',
     moveset_machine_table: '0x252BC8',
     moveset_level_table: '0x25d7b4',
+    moveset_tutor_table: '0x459B7E',
 
     item_table: '0x3DB028',
     machine_table: '0x45A80C',
+    tutor_table: '0x459B60',
 
     ability_table: '0x24FC40',
     type_table: '0x24F1A0',
@@ -62,9 +63,11 @@
       stats_table: '0x254784',
       moveset_machine_table: '0x252BC8',
       moveset_level_table: '0x25d7b4',
+      moveset_tutor_table: '0x459B7E',
 
       item_table: '0x3DB028',
       machine_table: '0x45A80C',
+      tutor_table: '0x459B60',
 
       ability_table: '0x24FC40',
       type_table: '0x24F1A0',
@@ -73,6 +76,8 @@
 
     BPEE: {
       title: 'Emerald (E)',
+
+      moveset_tutor_length: 4,
 
       name_table: '0x3185C8',
 
@@ -85,9 +90,11 @@
       stats_table: '0x3203CC',
       moveset_machine_table: '0x31E898',
       moveset_level_table: '0x32937C',
+      moveset_tutor_table: '0x615048',
 
       item_table: '0x5839A0',
       machine_table: '0x616040',
+      tutor_table: '0x61500C',
 
       ability_table: '0x31B6DB',
       type_table: '0x31AE38',
@@ -96,6 +103,8 @@
 
     AXVE: {
       title: 'Ruby (E)',
+
+      moveset_tutor_length: 0,
 
       name_table: '0x1F716C',
 
@@ -129,9 +138,11 @@
       stats_table: '0x254784',
       moveset_machine_table: '0x252BC8',
       moveset_level_table: '0x25d7b4',
+      moveset_tutor_table: '0x459B7E',
 
       item_table: '0x3DB028',
       machine_table: '0x45A80C',
+      tutor_table: '0x459B60',
 
       ability_table: '0x950000',
       type_table: '0x961B50',

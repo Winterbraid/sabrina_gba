@@ -83,6 +83,8 @@ module Sabrina
     #   {ByteOutput#generate_bytes} methods.
     # @option h [Boolean] :pointer_mode Whether to expect pointers in the
     #   table instead of actual data. This voids +:index_length+.
+    # @option h [Boolean] :force_overwrite Whether to always overwrite in place,
+    #   even if table says otherwise.
     # @option h [Boolean] :lz77 Whether to read and write ROM data as
     #   {Lz77}-compressed.
     # @option h [Boolean] :is_gba_string Whether to read ROM data as
@@ -117,6 +119,8 @@ module Sabrina
 
       @old_offset ||= nil
       @old_length ||= nil
+
+      @force_overwrite ||= false
 
       @lz77 ||= false
       @is_gba_string ||= false
@@ -247,6 +251,8 @@ module Sabrina
     def load_settings(h)
       @representation = h.fetch(:representation, @representation)
       @bytes_cache = h.fetch(:bytes_cache, @bytes_cache)
+
+      @force_overwrite = h.fetch(:force_overwrite, @force_overwrite || false)
 
       @lz77 = h.fetch(:lz77, @lz77 || false)
       @is_gba_string = h.fetch(:is_gba_string, @is_gba_string)

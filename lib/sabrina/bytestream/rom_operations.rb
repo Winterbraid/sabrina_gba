@@ -36,16 +36,15 @@ module Sabrina
         new_offset =
           if !@pointer_mode || !(@table && @index)
             @last_write << 'Bytestream#repoint: Overwriting in place.' \
-            " (#{old_offset})"
+              " (#{old_offset})"
             old_offset
             # Wipe and overwrite disabled due to
             # Lz77.uncompress[:original_length] inaccuracy.
-            #
-            # elsif new_length <= old_length
-            # @last_write << 'Repoint: New length less than or equal to old' \
-            #   'length, overwriting in place.'
-            # @last_write << @rom.wipe(old_offset, old_length, true)
-            # old_offset
+          elsif !@lz77 && (new_length <= old_length)
+            @last_write << 'Repoint: New length less than or equal to old' \
+              'length, overwriting in place.'
+            @last_write << @rom.wipe(old_offset, old_length, true)
+            old_offset
           else
             o = repoint
             @last_write << 'Bytestream#repoint: Wiping disabled in this' \
