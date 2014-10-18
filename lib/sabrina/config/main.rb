@@ -10,8 +10,14 @@
     hm_count: 8,
 
     name_length: 11,
+
+    enemy_y_length: 4,
+    player_y_length: 4,
+    enemy_alt_length: 4,
+
     stats_length: 28,
     moveset_machine_length: 8,
+    moveset_level_length: 4,
     moveset_tutor_length: 2,
 
     item_length: 44,
@@ -34,6 +40,10 @@
       385 => [4, 4],
       410 => [2, 2]
     },
+
+    enemy_y_table: '0x2349CC',
+    player_y_table: '0x235E6C',
+    enemy_alt_table: '0x23A004',
 
     stats_table: '0x254784',
     moveset_machine_table: '0x252BC8',
@@ -59,6 +69,10 @@
       back_table: '0x23654C',
       palette_table: '0x23730C',
       shinypal_table: '0x2380cc',
+
+      enemy_y_table: '0x2349CC',
+      player_y_table: '0x235E6C',
+      enemy_alt_table: '0x23A004',
 
       stats_table: '0x254784',
       moveset_machine_table: '0x252BC8',
@@ -87,6 +101,10 @@
       shinypal_table: '0x304438',
       frames: [2, 1],
 
+      enemy_y_table: '0x300D38',
+      player_y_table: '0x3021D8',
+      enemy_alt_table: '0x305DCC',
+
       stats_table: '0x3203CC',
       moveset_machine_table: '0x31E898',
       moveset_level_table: '0x32937C',
@@ -113,6 +131,10 @@
       palette_table: '0x1EA5B4',
       shinypal_table: '0x1EB374',
 
+      enemy_y_table: '0x1E7C74',
+      player_y_table: '0x1E9114',
+      enemy_alt_table: '0x1ECB14',
+
       stats_table: '0x1FEC18',
       moveset_machine_table: '0x1FD0F0',
       moveset_level_table: '0x207bc8',
@@ -134,6 +156,10 @@
       back_table: '0x23654C',
       palette_table: '0x23730C',
       shinypal_table: '0x2380cc',
+
+      enemy_y_table: '0x2349CC',
+      player_y_table: '0x235E6C',
+      enemy_alt_table: '0x23A004',
 
       stats_table: '0x254784',
       moveset_machine_table: '0x252BC8',

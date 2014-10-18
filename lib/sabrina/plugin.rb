@@ -113,15 +113,28 @@ module Sabrina
     #
     # @param [Object] parent
     # @return [Plugin]
-    def initialize(parent, *_args)
-      @parent = parent
+    def initialize(monster)
+      @monster = monster
+      @rom = monster.rom
+      @index = monster.index
+
+      reread
+    end
+
+    # Returns an array of child Bytestream objects.
+    #
+    # @return [Array]
+    def children
+      []
     end
 
     # Drop internal data and force reloading from ROM.
     #
-    # @return [Array] Any return data from child methods.
+    # @return [self]
     def reread(*_args)
       children.map(&:reload_from_rom)
+
+      self
     end
 
     # Write data to ROM.
@@ -131,11 +144,40 @@ module Sabrina
       children.map(&:write_to_rom)
     end
 
-    # Whether a plugin instance supports a feature.
+    # Save data to a file.
+    def save(file = @monster.filename, dir = @monster.work_dir, *_args)
+      target = get_path(file, dir, mkdir: true)
+
+      "#{ target[:file] } (#{ File.binwrite(target[:path], to_file) })"
+    end
+
+    # Load data from a file.
+    def load(file = @monster.filename, dir = @monster.work_dir, *_args)
+      path = get_path(file, dir)[:path]
+
+      load_hash(JSON.parse(File.read(path), symbolize_names: true))
+    end
+
+    # Loads a hash representation of the data. If present, nested hashes
+    # under a key equivalent to {SHORT_NAME} or own index will be loaded.
     #
-    # @return [Boolean]
-    def feature?(f)
-      self.class.features.include?(f)
+    # @param [Hash] hash
+    # @return [self]
+    def load_hash(hash)
+      hash.to_a
+      self
+    end
+
+    # Returns a pretty JSON representation of the data.
+    #
+    # @return [String]
+    def to_json
+      respond_to?(:to_hash) ? JSON.pretty_generate(to_hash) : nil
+    end
+
+    # Returns a file representation of the data.
+    def to_file
+      to_json
     end
 
     # Subclasses should override this to provide a useful textual
@@ -143,6 +185,13 @@ module Sabrina
     # @return [String]
     def to_s
       "<#{self.class.plugin_name}>"
+    end
+
+    # Whether a plugin instance supports a feature.
+    #
+    # @return [Boolean]
+    def feature?(f)
+      self.class.features.include?(f)
     end
 
     private
@@ -160,10 +209,15 @@ module Sabrina
       f, d = file.dup, dir.dup
       d << '/' unless d.empty? || d.end_with?('/')
 
+      suffix = self.class::SUFFIX
+
       FileUtils.mkpath(d) if h.fetch(:mkdir, false) && !Dir.exist?(d)
 
-      path = d << f
-      path << self::SUFFIX unless path.downcase.end_with?(self::SUFFIX)
+      f << suffix unless f.downcase.end_with?(suffix)
+      {
+        path: d << f,
+        file: f
+      }
     end
   end
 end

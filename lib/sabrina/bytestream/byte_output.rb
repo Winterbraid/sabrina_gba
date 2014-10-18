@@ -59,10 +59,13 @@ module Sabrina
       #
       # @return [String]
       def to_hex(pretty = false)
-        h = to_bytes.each_byte.to_a.map { |x| format('%02x', x) }.join('')
-        return h unless pretty
+        hex = to_bytes.each_byte.to_a.map { |byte| format('%02x', byte) }.join
+        return hex unless pretty
 
-        h.scan(/......../).map { |x| x.scan(/../).join(':') }.join(' ')
+        pretty_hex = []
+        pretty_hex << hex.slice!(0, 8).scan(/../).join(':') until hex.empty?
+
+        pretty_hex.join(' ')
       end
 
       # Same as {#to_hex}, but reverses the bytes before conversion.

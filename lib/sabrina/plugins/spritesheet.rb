@@ -16,9 +16,6 @@ module Sabrina
       # {include:Plugin::SHORT_NAME}
       SHORT_NAME = 'spritesheet'
 
-      # {include:Plugin::FEATURES}
-      FEATURES = Set.new [:reread, :write, :save, :load]
-
       # {include:Plugin::SUFFIX}
       SUFFIX = '.png'
 
@@ -40,14 +37,8 @@ module Sabrina
       # @return [Array]
       attr_reader :sprites
 
-      # Generates a new Spritesheet object.
-      #
-      # @return [Spritesheet]
-      def initialize(monster)
-        @monster = monster
-        @rom = monster.rom
-        @index = monster.index
-
+      # {include:Plugin#reread}
+      def reread
         @palettes = [
           Palette.from_table(@monster.rom, :palette_table, @monster.index),
           Palette.from_table(@monster.rom, :shinypal_table, @monster.index)
@@ -57,23 +48,18 @@ module Sabrina
           Sprite.from_table(@monster.rom, :front_table, @monster.index),
           Sprite.from_table(@monster.rom, :back_table, @monster.index)
         ]
+
+        self
       end
 
-      # @return [Array]
-      # @see ChildrenManager
+      # {include:Plugin#children}
       def children
         @sprites + @palettes
       end
 
-      # Justify sprites to the target ROM count as per ROM {Config}, assuming
-      # 64x64 frame size.
-      def justify
-        @sprites.map(&:justify)
-      end
-
       # Load data from a file.
       #
-      # @return [Array] Any return data from child methods.
+      # @return [self]
       def load(file = @monster.filename, dir = @monster.work_dir, *_args)
         path = get_path(file, dir)
         a = split_canvas(ChunkyPNG::Canvas.from_file(path))
@@ -107,24 +93,27 @@ module Sabrina
         ]
 
         justify
-        children
+        self
       end
 
-      # Save data to a file.
-      #
-      # @return [Array] Any return data from child methods.
-      def save(file = @monster.filename, dir = @monster.work_dir, *_args)
+       # Converts the sprite data to a 256x PNG datastream.
+      def to_file
         a = []
-        @sprites.product(@palettes).each do |x|
-          a << x.first.to_canvas(x.last)
+
+        @sprites.product(@palettes).each do |pair|
+          a << pair.first.to_canvas(pair.last)
         end
 
-        path = get_path(file, dir, mkdir: true)
-
-        combine_canvas(a).save(path)
+        combine_canvas(a).to_datastream
       end
 
       private
+
+      # Justify sprites to the target ROM count as per ROM {Config}, assuming
+      # 64x64 frame size.
+      def justify
+        @sprites.map(&:justify)
+      end
 
       # Crops the canvas to the specified height if taller.
       def crop_canvas(c, h)

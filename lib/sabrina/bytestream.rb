@@ -221,26 +221,6 @@ module Sabrina
       @offset
     end
 
-    # Tells the object that the ROM uses {Lz77} compression
-    # for the data.
-    # This is the same as setting +:lz77+=>+true+ in the options hash.
-    #
-    # @return [self]
-    def lz77_mode
-      @lz77 = true
-      self
-    end
-
-    # Tells the object that the data is a GBA-encoded, 0xFF-terminated
-    # string.
-    # This is the same as setting :is_gba_string=>true in the options hash.
-    #
-    # @return [self]
-    def string_mode
-      @is_gba_string = true
-      self
-    end
-
     private
 
     # Loads a hash of options. Subclasses should override this to allow
@@ -256,6 +236,7 @@ module Sabrina
 
       @lz77 = h.fetch(:lz77, @lz77 || false)
       @is_gba_string = h.fetch(:is_gba_string, @is_gba_string)
+      @old_length = h.fetch(:old_length, @old_length)
 
       @rom = h.fetch(:rom, @rom)
       @offset = Bytestream.parse_offset(h[:offset]) if h.key?(:offset)

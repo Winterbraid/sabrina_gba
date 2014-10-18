@@ -20,7 +20,7 @@ module Sabrina
       #
       # @return [Array] see {#last_write}.
       def write_to_rom
-        old_length = calculate_length
+        @old_length ||= calculate_length
         b = (@lz77 ? to_lz77 : to_bytes)
         new_length = b.length
         old_offset = offset
@@ -28,36 +28,35 @@ module Sabrina
         unless @rom && old_offset
           fail 'Rom and offset or table/index must be set before writing.'
         end
-        fail 'Byte string is empty. Aborting.' if b.empty?
-        fail "Byte string too long #{new_length}. Aborting." if new_length > 10_000
+        fail 'Byte string is empty.' if b.empty?
+        fail "Byte string too long (#{new_length})." if new_length > 10_000
 
         @last_write = []
 
         new_offset =
-          if !@pointer_mode || !(@table && @index)
+          if @force_overwrite || !@pointer_mode || !(@table && @index)
             @last_write << 'Bytestream#repoint: Overwriting in place.' \
               " (#{old_offset})"
             old_offset
-            # Wipe and overwrite disabled due to
+            # Wipe and overwrite disabled for lz77 data due to
             # Lz77.uncompress[:original_length] inaccuracy.
-          elsif !@lz77 && (new_length <= old_length)
+          elsif !@lz77 && (new_length <= @old_length)
             @last_write << 'Repoint: New length less than or equal to old' \
               'length, overwriting in place.'
-            @last_write << @rom.wipe(old_offset, old_length, true)
+            @last_write << @rom.wipe(old_offset, @old_length, true)
             old_offset
           else
             o = repoint
-            @last_write << 'Bytestream#repoint: Wiping disabled in this' \
-              "version. Leaving #{old_length} bytes at #{old_offset}" \
-              " (#{ format('%06X', old_offset) }) in #{@rom} intact."
+            @last_write << @rom.wipe(old_offset, @old_length) unless @lz77
             @last_write << "Bytestream#repoint: Repointed to #{o}" \
               " (#{ format('%06X', o) })."
-            # @last_write << @rom.wipe(old_offset, old_length)
             o
           end
 
         @last_write << @rom.write(new_offset, b)
         clear_cache(lz77: false)
+
+        @old_length = calculate_length
 
         @last_write
       end
@@ -72,6 +71,8 @@ module Sabrina
         present
         self
       end
+
+      alias_method :reread, :reload_from_rom
 
       # Wipes the internal cache so that the data may be reloaded from ROM if
       # present.
@@ -91,6 +92,8 @@ module Sabrina
         self
       end
 
+      private
+
       # @todo Return key +:original_length+ for {Lz77.uncompress} is currently
       #   unreliable. Wipe and overwrite in place for table data is disabled.
       #
@@ -106,8 +109,6 @@ module Sabrina
         end
         to_bytes.length
       end
-
-      private
 
       # Assigns the data to a suitable free space on the ROM and updates
       # the table accordingly.

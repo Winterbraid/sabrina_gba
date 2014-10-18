@@ -77,10 +77,15 @@ module Sabrina
     # Fetches a specific key from the ROM {Config} data.
     #
     # @param [String, Symbol] p the key to look for.
+    # @param [Object] default The fallback value. Will fail if not provided
+    #   and key not found.
     # @see Config
-    def param(p)
+    def param(p, default = nil)
       s = p.to_sym
-      @params.fetch(s) { fail "No parameter #{s} for ROM type #{@id}." }
+      @params.fetch(s) do
+        fail "No parameter #{s} for ROM type #{@id}." if default.nil?
+        default
+      end
     end
 
     # Gets the name of the monster identified by +real_index+ from
@@ -119,7 +124,8 @@ module Sabrina
     # @param [Integer] length the length of a single entry.
     # @return [Integer]
     # @see offset_to_pointer
-    def read_offset_from_table(name, index, length = 8)
+    def read_offset_from_table(name, index, length = nil)
+      length ||= param(name.to_s.sub('_table', '_length'), 8)
       pointer = read_table(name, index, length, 3)
       self.class.pointer_to_offset(pointer)
     end
@@ -268,8 +274,10 @@ module Sabrina
     # @return [String] a debug message.
     # @see offset_to_pointer
     def write_offset_to_table(name, index, offset)
+      index_length ||= param(name.to_s.sub('_table', '_length'), 8)
+
       write(
-        table(name) + index * 8,
+        table(name) + index * index_length,
         self.class.offset_to_pointer(offset)
       )
     end

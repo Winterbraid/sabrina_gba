@@ -14,9 +14,6 @@ module Sabrina
       # {include:Plugin::SHORT_NAME}
       SHORT_NAME = 'stats'
 
-      # {include:Plugin::FEATURES}
-      FEATURES = Set.new [:reread, :write]
-
       # {include:Plugin::SUFFIX}
       SUFFIX = '_stats.json'
 
@@ -66,24 +63,6 @@ module Sabrina
       # This breaks Yard.
       attr_accessor(:rom, :index, *STRUCTURE)
 
-      # Generates a new Stats object.
-      #
-      # @return [Stats]
-      def initialize(monster)
-        @monster = monster
-        @rom = monster.rom
-        @index = monster.index
-
-        @stream = Bytestream.from_table(
-          @rom,
-          :stats_table,
-          @monster.index,
-          @rom.stats_length
-        )
-
-        parse_stats
-      end
-
       # Returns the base stats total.
       #
       # @return [Integer]
@@ -99,31 +78,23 @@ module Sabrina
         self
       end
 
-      # Write data to the ROM.
-      def write
-        stream.write_to_rom
+      # {include:Plugin#children}
+      def children
+        [
+          Bytestream.from_bytes(
+            unparse_stats,
+            rom: @rom,
+            table: :stats_table,
+            index: @index
+          )
+        ]
       end
 
-      # Returns a {Bytestream} object representing the stats, ready to be
-      # written to the ROM.
-      #
-      # @return [Bytestream]
-      def stream
-        Bytestream.from_bytes(
-          unparse_stats,
-          rom: @rom,
-          table: :stats_table,
-          index: @index
-        )
-      end
-
-      # Loads a hash representation of the stats. If present, nested hashes
-      # under a key equivalent to +:stats+ or own index will be loaded.
-      #
-      # @param [Hash] hash
-      # @return [self]
+      # {include:Plugin#load_hash}
       def load_hash(hash)
-        return load_hash(hash[@index]) if hash.key?(@index)
+        root_key = @index.to_s.to_sym
+
+        return load_hash(hash[root_key]) if hash.key?(root_key)
         return load_hash(hash[:stats]) if hash.key?(:stats)
 
         STRUCTURE.each do |entry|
@@ -131,12 +102,14 @@ module Sabrina
           pretty_value = prettify_stat(entry, value)
           instance_variable_set('@' << entry.to_s, pretty_value)
         end
+
+        self
       end
 
       # Returns a hash representation of the stats.
       #
       # @return [Hash]
-      def to_h
+      def to_hash
         h = {}
 
         STRUCTURE.each do |entry|
@@ -146,18 +119,13 @@ module Sabrina
         { @index => { stats: h } }
       end
 
+      alias_method :to_h, :to_hash
+
       # Returns a pretty hexadecimal representation of the stats byte data.
       #
       # @return [String]
       def to_hex
         stream.to_hex(true)
-      end
-
-      # Returns a pretty JSON representation of the stats.
-      #
-      # @return [String]
-      def to_json
-        JSON.pretty_generate(to_h)
       end
 
       # Returns a blurb containing the base stats total.
@@ -171,19 +139,26 @@ module Sabrina
 
       # Reads stats data from the ROM.
       def parse_stats
-        b = @stream.to_bytes.dup
+        bytestream = Bytestream.from_table(
+          @rom,
+          :stats_table,
+          @monster.index,
+          @rom.stats_length
+        )
+
+        bytes = bytestream.to_bytes
 
         STRUCTURE.each do |entry|
           value =
             case entry
             when :ev_yield
-              parse_evs(b.slice!(0, 2))
+              parse_evs(bytes.slice!(0, 2))
             when :item_1, :item_2
-              b.slice!(0, 2).unpack('S').first
+              bytes.slice!(0, 2).unpack('S').first
             when :color_flip
-              parse_color_flip(b.slice!(0))
+              parse_color_flip(bytes.slice!(0))
             else
-              b.slice!(0).unpack('C').first
+              bytes.slice!(0).unpack('C').first
             end
 
           pretty_value = prettify_stat(entry, value)

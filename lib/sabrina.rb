@@ -43,5 +43,6 @@ require 'sabrina/plugin.rb'
 require 'sabrina/plugins/spritesheet.rb'
 require 'sabrina/plugins/stats.rb'
 require 'sabrina/plugins/moveset.rb'
+require 'sabrina/plugins/battler.rb'
 
 Sabrina::Config.load_user_config

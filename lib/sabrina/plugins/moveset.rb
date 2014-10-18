@@ -6,8 +6,6 @@ module Sabrina
     #
     # @see Plugin
     class Moveset < Plugin
-      include ChildrenManager
-
       # {include:Plugin::ENHANCES}
       ENHANCES = Monster
 
@@ -16,9 +14,6 @@ module Sabrina
 
       # {include:Plugin::SHORT_NAME}
       SHORT_NAME = 'moveset'
-
-      # {include:Plugin::FEATURES}
-      FEATURES = Set.new [:reread]
 
       # {include:Plugin::SUFFIX}
       SUFFIX = '_moveset.json'
@@ -39,7 +34,7 @@ module Sabrina
       #   All HMs that the monster can learn.
       #   @return [Set]
       # @!attribute [rw] level
-      #   All moves the monster can learn by level up, as a set of two-element
+      #   All moves the monster can learn by level-up, as a set of two-element
       #   [level, index] arrays.
       #   @return [Set]
       # @!attribute [rw] tutor
@@ -53,31 +48,43 @@ module Sabrina
 
       alias_method :hm, :hidden_machines
 
-      # Stores level up data between calls to parse from ROM.
+      # Stores original level-up data between calls to read from ROM.
       #
       # @return [String]
       attr_reader :old_level
 
-      # Generates a new Moveset object.
-      #
-      # @return [moveset]
-      def initialize(monster)
-        @monster = monster
-        @rom = monster.rom
-        @index = monster.index
-
-        reread
-      end
-
-      # Reloads the data from a ROM, dropping any changes.
-      #
-      # @return [self]
+      # {include:Plugin#reread}
       def reread
         parse_machines
         parse_levelup
         parse_tutor if @rom.moveset_tutor_length > 0
 
         self
+      end
+
+      # {include:Plugin#children}
+      def children
+        opts = { rom: @rom, index: @index }
+
+        streams_array = [
+          Bytestream.from_bytes(
+            unparse_machines, opts.merge(table: :moveset_machine_table)
+          ),
+          Bytestream.from_bytes(
+            unparse_levelup,
+            opts.merge(
+              table: :moveset_level_table,
+              old_length: @old_level.length,
+              pointer_mode: true
+            )
+          )
+        ]
+
+        return streams_array unless @rom.moveset_tutor_length > 0
+
+        streams_array << Bytestream.from_bytes(
+          unparse_tutor, opts.merge(table: :moveset_tutor_table,)
+        )
       end
 
       # Returns an annotated version of TM compatibility.
@@ -88,11 +95,12 @@ module Sabrina
           machine = tech_machine - 1
           move_i = @rom.read_table(:machine_table, machine, 2).unpack('S').first
           name = @rom.read_string_from_table(:move_name_table, move_i)
+
           "#{tech_machine} (#{name})"
         end
       end
 
-      # Returns an annotated version of TM compatibility.
+      # Returns an annotated version of HM compatibility.
       #
       # @return [Set]
       def hm_pretty
@@ -100,18 +108,8 @@ module Sabrina
           machine = hidden_machine + @rom.tm_count - 1
           move_i = @rom.read_table(:machine_table, machine, 2).unpack('S').first
           name = @rom.read_string_from_table(:move_name_table, move_i)
-          "#{hidden_machine} (#{name})"
-        end
-      end
 
-      # Returns an annotated version of tutor data.
-      #
-      # @return [Set]
-      def tutor_pretty
-        @tutor.map do |move|
-          move_i = @rom.read_table(:tutor_table, move, 2).unpack('S').first
-          name = @rom.read_string_from_table(:move_name_table, move_i)
-          "#{move} (#{name})"
+          "#{hidden_machine} (#{name})"
         end
       end
 
@@ -129,14 +127,54 @@ module Sabrina
         end
       end
 
-      # Remove this.
-      def unparse
-        {
-          machines: unparse_machines,
-          level: unparse_levelup,
-          tutor: unparse_tutor
-        }
+      # Returns an annotated version of tutor data.
+      #
+      # @return [Set]
+      def tutor_pretty
+        @tutor.map do |move|
+          move_i = @rom.read_table(:tutor_table, move, 2).unpack('S').first
+          name = @rom.read_string_from_table(:move_name_table, move_i)
+          "#{move} (#{name})"
+        end
       end
+
+      # {include:Plugin#load_hash}
+      def load_hash(hash)
+        root_key = @index.to_s.to_sym
+
+        return load_hash(hash[root_key]) if hash.key?(root_key)
+        return load_hash(hash[:moveset]) if hash.key?(:moveset)
+
+        STRUCTURE.each do |entry|
+          next unless hash.key?(entry)
+          value =
+            if entry == :level
+              hash[entry].map { |learned_move| learned_move.map(&:to_i) }
+            else
+              hash[entry].map(&:to_i)
+            end
+
+          instance_variable_set('@' << entry.to_s, value.to_set)
+        end
+
+        self
+      end
+
+      # Returns a hash of moveset data.
+      #
+      # @return [Hash]
+      def to_hash
+        hash = {
+          tech_machines: tm_pretty,
+          hidden_machines: hm_pretty,
+          level: level_pretty,
+          tutor: tutor_pretty
+        }
+
+        { @index => { moveset: hash } }
+      end
+
+      alias_method :to_h, :to_hash
 
       private
 
