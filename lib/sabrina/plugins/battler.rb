@@ -3,10 +3,7 @@ module Sabrina
     # Handles information about sprite positioning on the battle screen.
     #
     # @see Plugin
-    class Battlers < Plugin
-      # {include:Plugin::ENHANCES}
-      ENHANCES = Monster
-
+    class Battler < Plugin
       # {include:Plugin::PLUGIN_NAME}
       PLUGIN_NAME = 'Battler'
 

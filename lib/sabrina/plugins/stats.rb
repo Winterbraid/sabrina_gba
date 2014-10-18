@@ -1,13 +1,9 @@
 module Sabrina
   module Plugins
-    # @todo Finish this class.
     # This {Plugin} aids in manipulating the basic stats of any {Monster}.
     #
     # @see Plugin
     class Stats < Plugin
-      # {include:Plugin::ENHANCES}
-      ENHANCES = Monster
-
       # {include:Plugin::PLUGIN_NAME}
       PLUGIN_NAME = 'Stats'
 

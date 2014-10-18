@@ -6,10 +6,8 @@ module Sabrina
   module Plugins; end
 
   # The base class for plugins that improve classes with the ability
-  # to handle additional data. The +#initialize+ method for every
-  # plugin should accept a target class instance as the parameter.
-  # The +#initialize+ method of the target class should contain
-  # a call to +load_plugins+.
+  # to handle additional data. The +#initialize+ method of the target
+  # class should contain a call to +load_plugins+.
   #
   # When a class has been enhanced by a plugin, it will gain a read-only
   # attribute +#plugins+ that will contain a set of all plugins registered
@@ -22,6 +20,11 @@ module Sabrina
   # will call +#feature+ on every plugin instance that supports it, and
   # +#feature_shortname+, which will call +#feature+ on the instance of the
   # plugin identified by {SHORT_NAME} (assuming it supports that feature).
+  #
+  # The base Plugin class makes some assumptions about how certain features
+  # might be implemented in subclasses, this might speed up development
+  # of plugins. Refer to {#write}, {#save} and {#load} for details or override
+  # those methods with your own versions inside subclasses.
   #
   # For clarity, plugins should be contained within the {Plugins}
   # namespace.

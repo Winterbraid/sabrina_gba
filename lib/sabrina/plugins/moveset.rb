@@ -1,14 +1,10 @@
 module Sabrina
   module Plugins
-    # @todo Finish this class.
     # This {Plugin} handles all attacks that a {Monster} learns through leveling
     # up, items, or tutoring.
     #
     # @see Plugin
     class Moveset < Plugin
-      # {include:Plugin::ENHANCES}
-      ENHANCES = Monster
-
       # {include:Plugin::PLUGIN_NAME}
       PLUGIN_NAME = 'Moveset'
 

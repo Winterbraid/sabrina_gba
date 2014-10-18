@@ -1,4 +1,5 @@
 module Sabrina
+  # @todo Rewrite this module.
   # An utility module for compressing and decompressing data in a
   # GBA-compliant {http://en.wikipedia.org/wiki/LZ77_and_LZ78 LZ77} format.
   #

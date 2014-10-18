@@ -6,10 +6,6 @@ module Sabrina
     # @see Plugin
     class Spritesheet < Plugin
       include ChildrenManager
-
-      # {include:Plugin::ENHANCES}
-      ENHANCES = Monster
-
       # {include:Plugin::PLUGIN_NAME}
       PLUGIN_NAME = 'Spritesheet'
 
