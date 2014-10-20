@@ -13,7 +13,7 @@
 
     enemy_y_length: 4,
     player_y_length: 4,
-    enemy_alt_length: 4,
+    enemy_alt_length: 1,
 
     stats_length: 28,
     moveset_machine_length: 8,

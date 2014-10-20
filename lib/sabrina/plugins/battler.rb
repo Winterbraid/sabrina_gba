@@ -42,12 +42,24 @@ module Sabrina
       def reread
         STRUCTURE.each do |entry|
           bytes = @rom.read_table(entry.to_s << '_table', @index)
-          value = bytes[1].unpack('C').first
+          byte = (entry == :enemy_alt ? bytes[0] : bytes[1])
+          value = byte.unpack('C').first
 
           instance_variable_set('@' << entry.to_s, value)
         end
 
         self
+      end
+
+      # {include:Plugin#write}
+      def write
+        STRUCTURE.map do |entry|
+          offset = @rom.table_to_offset(entry.to_s << '_table', @index)
+          offset += 1 unless entry == :enemy_alt
+          byte = instance_variable_get('@' << entry.to_s).chr
+
+          @rom.write(offset, byte)
+        end
       end
 
       # {include:Plugin#load_hash}
