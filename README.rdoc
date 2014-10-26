@@ -1,5 +1,8 @@
 = Sabrina
 
+{<img src="http://inch-ci.org/github/Winterbraid/sabrina_gba.svg?branch=master"/>}[http://inch-ci.org/github/Winterbraid/sabrina_gba]
+{<img src="https://codeclimate.com/github/Winterbraid/sabrina_gba/badges/gpa.svg"/>}[https://codeclimate.com/github/Winterbraid/sabrina_gba]
+
 A library for manipulating GBA ROMs of a popular monster collection RPG series.
 It is written entirely in Ruby and uses
 {Chunky PNG}[https://github.com/wvanbergen/chunky_png], which is also a pure
@@ -129,6 +132,9 @@ table offsets have been changed).
 
 == Known issues
 
+* The Lz77 module will need to be refactored eventually.
+* Some long classes could do also with refactoring. Rom, Sprite, Palette and
+  Moveset are primary suspects.
 * Either the Lz77 compressor or the image encoder has a problem with the monster
   no. 360 for some reason. Copying from another ROM still works fine (likely
   because it bypasses the encoding step and uses the data from the source ROM
