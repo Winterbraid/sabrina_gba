@@ -116,7 +116,7 @@ module Sabrina
 
     # Generates a new {Plugin} object.
     #
-    # @param [Object] parent
+    # @param [Object] monster
     # @return [Plugin]
     def initialize(monster)
       @monster = monster

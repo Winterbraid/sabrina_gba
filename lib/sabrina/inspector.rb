@@ -1,8 +1,13 @@
 module Sabrina
+  # Provides an +#inspect+ method that behaves more like what 1.9.x
   module Inspector
+    # Stores the original +#inspect+ method.
+    #
+    # @return [String]
     alias_method :long_inspect, :inspect
 
-    # Changes inspect behaviour to be closer to 1.9.x (and look saner in IRB).
+    # Inspect defaults to +#to_s+ if present, otherwise uses the previously
+    # defined method.
     #
     # @return [String]
     def inspect
