@@ -1,5 +1,6 @@
 module Sabrina
-  # Provides an +#inspect+ method that behaves more like what 1.9.x
+  # Provides an +#inspect+ method that behaves more like what 1.9.x used to do.
+  # This is mainly for saner behaviour in new versions of IRB, Pry etc.
   module Inspector
     # Stores the original +#inspect+ method.
     #
