@@ -4,6 +4,8 @@ module Sabrina
   # {Bytestream}-family objects, you should not need to deal with it
   # or any of its methods directly.
   class Rom
+    include Inspector
+
     # The position in the ROM file from which to read the 4-byte
     # identifier string. This is relied upon to pull the ROM type
     # data from the {Config}.

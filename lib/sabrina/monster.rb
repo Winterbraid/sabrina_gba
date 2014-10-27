@@ -5,6 +5,7 @@ module Sabrina
   # See {Sabrina::Plugins} for extensions that might enhance this class
   # with added functionality.
   class Monster
+    include Inspector
     include ChildrenManager
 
     # @!attribute [rw] rom

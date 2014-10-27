@@ -23,6 +23,7 @@ require 'sabrina/config/charmap_out_special.rb'
 
 require 'sabrina/lz77.rb'
 require 'sabrina/children_manager.rb'
+require 'sabrina/inspector.rb'
 
 require 'sabrina/bytestream/byte_input.rb'
 require 'sabrina/bytestream/byte_output.rb'

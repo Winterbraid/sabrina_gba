@@ -29,6 +29,8 @@ module Sabrina
   # For clarity, plugins should be contained within the {Plugins}
   # namespace.
   class Plugin
+    include Inspector
+
     # What class this plugin enhances. This should be required before
     # the plugin.
     #
